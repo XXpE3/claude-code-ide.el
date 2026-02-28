@@ -593,6 +593,21 @@ have completed before cleanup.  Waits up to 5 seconds."
       ;; Restore original value
       (setq claude-code-ide-vterm-anti-flicker original-value))))
 
+(ert-deftest claude-code-ide-test-configure-vterm-disables-buffer-rename ()
+  "Test that configuring vterm disables automatic buffer renaming.
+When vterm-buffer-name-string is non-nil, vterm renames the buffer
+based on terminal title escape sequences, breaking session lookups."
+  (with-temp-buffer
+    ;; Simulate vterm-buffer-name-string being set (the default in vterm)
+    (setq-local vterm-buffer-name-string "%s")
+    ;; Stub out functions that configure-vterm-buffer calls
+    (cl-letf (((symbol-function 'get-buffer-process) (lambda (_buf) nil))
+              ((symbol-function 'hl-line-mode) (lambda (_arg) nil))
+              ((symbol-function 'face-remap-add-relative) (lambda (&rest _) nil)))
+      (let ((claude-code-ide-vterm-anti-flicker nil))
+        (claude-code-ide--configure-vterm-buffer)
+        (should (null vterm-buffer-name-string))))))
+
 (ert-deftest claude-code-ide-test-run-with-cli ()
   "Test successful run command execution."
   (skip-unless nil) ; Skip this test for now

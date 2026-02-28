@@ -416,6 +416,9 @@ cursor management, and process buffering for superior user experience."
     (hl-line-mode -1))
   ;; make sure the non-breaking space in the prompt isn't themed
   (face-remap-add-relative 'nobreak-space :inherit 'default)
+  ;; Prevent vterm from renaming the buffer when CLI sets a terminal title,
+  ;; which would break all session lookups by buffer name.
+  (setq-local vterm-buffer-name-string nil)
   ;; Register hook for copy-mode cursor visibility
   (add-hook 'vterm-copy-mode-hook #'claude-code-ide--vterm-copy-mode-hook nil t)
   ;; Increase process read buffering to batch more updates together
